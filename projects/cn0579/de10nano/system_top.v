@@ -134,7 +134,11 @@ module system_top (
   // dac i2c
 
   inout             dac_i2c_scl,
-  inout             dac_i2c_sda
+  inout             dac_i2c_sda,
+
+  // 2kHz square wave output on GPIO_0[9]
+
+  output            gpio_2khz_out
 );
 
   // internal signals
@@ -143,6 +147,29 @@ module system_top (
   wire    [63:0]   gpio_i;
   wire    [63:0]   gpio_o;
   wire    [63:0]   gpio_t;
+
+  // 2kHz clock divider
+  // sys_clk = 50MHz, 2kHz = 50MHz / 25000
+  // Toggle every 12500 cycles for 50% duty cycle
+
+  reg [13:0] clk_div_counter;
+  reg        clk_2khz_reg;
+
+  always @(posedge sys_clk or negedge sys_resetn) begin
+    if (!sys_resetn) begin
+      clk_div_counter <= 14'd0;
+      clk_2khz_reg <= 1'b0;
+    end else begin
+      if (clk_div_counter == 14'd12499) begin
+        clk_div_counter <= 14'd0;
+        clk_2khz_reg <= ~clk_2khz_reg;
+      end else begin
+        clk_div_counter <= clk_div_counter + 14'd1;
+      end
+    end
+  end
+
+  assign gpio_2khz_out = clk_2khz_reg;
 
   wire             i2c1_out_data;
   wire             i2c1_sda;
