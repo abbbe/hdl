@@ -138,7 +138,10 @@ module system_top (
 
   // 2kHz square wave output on GPIO_0[9]
 
-  output            gpio_2khz_out
+  output            gpio_2khz_out,
+
+  // External 40MHz pulse input (directly from GPIO or mock generator)
+  input             ext_pulse_in
 );
 
   // internal signals
@@ -170,6 +173,48 @@ module system_top (
   end
 
   assign gpio_2khz_out = clk_2khz_reg;
+
+  // Mock 40MHz generator for testing pulse counter
+  // sys_clk = 50MHz, toggle at 40MHz rate means toggle every 0.625 cycles
+  // Since we can't do fractional cycles, we approximate:
+  // 50MHz / 40MHz = 1.25, so we alternate between 1 and 2 cycle periods
+  // Or simpler: generate 25MHz (toggle every cycle) or use a different approach
+  // For a clean test signal, let's generate 10MHz (toggle every 2.5 cycles -> 2 or 3)
+  // Actually, let's generate exactly 12.5MHz (toggle every 2 cycles = 25MHz / 2)
+  // For testing, a 10MHz signal works: toggle every 2.5 cycles
+  // Simplest: generate 25MHz by toggling every cycle (divide by 2)
+
+  // Let's generate a 5MHz test signal (toggle every 5 cycles)
+  // 50MHz / 10 = 5MHz (toggle every 5 cycles for 50% duty)
+
+  reg [2:0] mock_40mhz_counter;
+  reg       mock_40mhz_signal;
+
+  // Select between external input and mock generator
+  // For testing, we'll use the mock generator by default
+  // Set USE_MOCK_GENERATOR to 0 to use external input
+  localparam USE_MOCK_GENERATOR = 1;
+
+  wire pulse_to_counter;
+
+  always @(posedge sys_clk or negedge sys_resetn) begin
+    if (!sys_resetn) begin
+      mock_40mhz_counter <= 3'd0;
+      mock_40mhz_signal <= 1'b0;
+    end else begin
+      // Generate ~8.33MHz signal (toggle every 3 cycles = 50MHz/6)
+      // This is fast enough to test but not too fast
+      if (mock_40mhz_counter == 3'd2) begin
+        mock_40mhz_counter <= 3'd0;
+        mock_40mhz_signal <= ~mock_40mhz_signal;
+      end else begin
+        mock_40mhz_counter <= mock_40mhz_counter + 3'd1;
+      end
+    end
+  end
+
+  // Use mock generator for testing, can switch to external later
+  assign pulse_to_counter = USE_MOCK_GENERATOR ? mock_40mhz_signal : ext_pulse_in;
 
   wire             i2c1_out_data;
   wire             i2c1_sda;
@@ -306,6 +351,7 @@ module system_top (
     .axi_hdmi_tx_0_hdmi_if_h24_hsync(hdmi_hsync),
     .axi_hdmi_tx_0_hdmi_if_h24_vsync(hdmi_vsync),
     .axi_hdmi_tx_0_hdmi_if_h24_data_e(hdmi_data_e),
-    .axi_hdmi_tx_0_hdmi_if_h24_data(hdmi_data));
+    .axi_hdmi_tx_0_hdmi_if_h24_data(hdmi_data),
+    .pulse_in_pulse_in(pulse_to_counter));
 
 endmodule

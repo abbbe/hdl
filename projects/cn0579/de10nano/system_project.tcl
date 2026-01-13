@@ -66,6 +66,11 @@ set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to dac_i2c_sda
 set_location_assignment PIN_AH3  -to gpio_2khz_out  ; ## GPIO_0[9]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to gpio_2khz_out
 
+# External pulse input (virtual pin - mock generator is used by default)
+# When switching to real external input, assign a physical GPIO pin
+
+set_instance_assignment -name VIRTUAL_PIN ON -to ext_pulse_in
+
 # Enable bitstream compression (required for FPGA manager loading)
 set_global_assignment -name ON_CHIP_BITSTREAM_DECOMPRESSION ON
 
