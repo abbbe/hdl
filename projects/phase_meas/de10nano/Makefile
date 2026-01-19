@@ -12,5 +12,6 @@ M_DEPS += ../../common/de10nano/de10nano_system_assign.tcl
 LIB_DEPS += axi_sysid
 LIB_DEPS += sysid_rom
 LIB_DEPS += phase_meas
+LIB_DEPS += phase_dps_ctrl
 
 include ../../scripts/project-intel.mk

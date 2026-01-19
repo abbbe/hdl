@@ -102,15 +102,15 @@ add_connection phase_dps_ctrl_0.avm pll_b_reconfig.mgmt_avalon_slave
 
 # =============================================================================
 # Phase Measurement System
-# Uses h2f_user2_clock (400 MHz from HPS) for sampling
+# Uses h2f_user2_clock (100 MHz from HPS) for sampling
 # Device has only 3 fractional PLL locations: pixel_clk_pll + pll_a + pll_b
 # =============================================================================
 
 add_instance phase_meas_0 phase_meas
-set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {400000000}
+set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {100000000}
 set_instance_parameter_value phase_meas_0 {SAMPLE_INTERVAL_US} {500}
 
-# Connect h2f_user2_clock (400 MHz) for sampling (if_sample_clk interface)
+# Connect h2f_user2_clock (100 MHz) for sampling (if_sample_clk interface)
 add_connection sys_hps.h2f_user2_clock phase_meas_0.if_sample_clk
 add_connection sys_clk.clk_reset phase_meas_0.if_reset
 
