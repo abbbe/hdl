@@ -16,28 +16,30 @@
 
 ## Architecture
 
+Note: Uses h2f_user2_clk (100 MHz from HPS) for sampling to stay within
+the 3 fractional PLL limit on Cyclone V (pixel_clk_pll + pll_a + pll_b).
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                            DE10-Nano                                 │
 │                                                                      │
-│   50 MHz ──┬──────────────┬──────────────┐                          │
-│            │              │              │                          │
-│            ▼              ▼              ▼                          │
-│     ┌──────────┐   ┌──────────┐   ┌──────────┐                      │
-│     │  PLL_A   │   │  PLL_B   │   │PLL_SAMPLE│                      │
-│     │ (100MHz) │   │ (100MHz) │   │ (200MHz) │                      │
-│     │ reconfig │   │ reconfig │   │  fixed   │                      │
-│     └────┬─────┘   └────┬─────┘   └────┬─────┘                      │
-│          │              │              │                            │
-│          │              │         ┌────┘                            │
-│          ▼              ▼         ▼                                 │
+│   50 MHz ──┬──────────────┬                                         │
+│            │              │         ┌── HPS ────────────┐           │
+│            ▼              ▼         │ h2f_user2_clk     │           │
+│     ┌──────────┐   ┌──────────┐     │ (100 MHz)         │           │
+│     │  PLL_A   │   │  PLL_B   │     └────────┬──────────┘           │
+│     │ (100MHz) │   │ (100MHz) │              │                      │
+│     │ reconfig │   │ reconfig │              │                      │
+│     └────┬─────┘   └────┬─────┘              │                      │
+│          │              │                    │                      │
+│          ▼              ▼                    ▼                      │
 │     ┌─────────────────────────────────────────┐                     │
 │     │        Phase Measurement Core           │                     │
 │     │                                         │                     │
 │     │  clk_a ──► [2-flop sync] ──► edge_a    │                     │
 │     │  clk_b ──► [2-flop sync] ──► edge_b    │                     │
 │     │                    │                    │                     │
-│     │            200 MHz sample clock         │                     │
+│     │            100 MHz sample clock         │                     │
 │     │                    │                    │                     │
 │     │  ┌─────────────────┴─────────────────┐ │                     │
 │     │  │  Rise/Fall counters (per channel) │ │                     │
@@ -80,7 +82,11 @@
 |-----|-----------|---------|----------|
 | PLL_A | 100 MHz | Clock output A | Yes (from Linux) |
 | PLL_B | 100 MHz | Clock output B | Yes (from Linux) |
-| PLL_SAMPLE | 200 MHz | Edge sampling | No (fixed) |
+| h2f_user2_clk | 100 MHz | Edge sampling | No (HPS clock) |
+
+Note: Cyclone V 5CSEBA6 has only 3 fractional PLL locations. The base system
+uses pixel_clk_pll for HDMI, leaving 2 for pll_a and pll_b. Sampling uses
+the HPS-provided h2f_user2_clk instead of a dedicated PLL.
 
 ### GPIO Clock Outputs
 | Signal | Pin | GPIO | Purpose |
@@ -100,7 +106,7 @@
 ### Resolution
 | Measurement | Resolution | Method |
 |-------------|------------|--------|
-| Edge timing | 5 ns | 200 MHz sampling |
+| Edge timing | 10 ns | 100 MHz sampling (h2f_user2_clk) |
 | Edge count | exact | Free-running counters |
 | Frequency | sub-ppb | Fractional-N PLL |
 
@@ -197,4 +203,11 @@ cu -l /dev/ttyUSB0 -s 115200   # Exit with ~.
 
 ## Development Log
 
-(To be updated during development cycle)
+### 2026-01-19: Initial Bring-up
+- Build successful with full base system (including HDMI)
+- Fixed PLL resource overflow by using h2f_user2_clk for sampling
+- Edge counting verified working on DE10-Nano
+- Issue: Measured frequency is 33.33 MHz instead of expected 100 MHz
+  - Both channels show consistent 33.33 MHz = 100/3 MHz
+  - Need oscilloscope to verify actual PLL output
+  - Possible causes: PLL misconfiguration, h2f_user2_clk rate, aliasing
