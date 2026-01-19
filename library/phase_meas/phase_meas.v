@@ -4,7 +4,7 @@
 //
 // Register Map (from HPS via Avalon-MM):
 //   0x00: CTRL     (R/W) - bit0=enable, bit1=clear_fifo
-//   0x04: STATUS   (R)   - bits[3:0]=fifo_count, bit4=overflow, bit5=fifo_empty
+//   0x04: STATUS   (R)   - bits[4:0]=fifo_count, bit5=overflow, bit6=fifo_empty
 //   0x08: DATA0    (R)   - VITA timestamp [31:0]
 //   0x0C: DATA1    (R)   - VITA timestamp [63:32]
 //   0x10: DATA2    (R)   - Rise edges ch_a delta [31:0]
@@ -346,7 +346,7 @@ module phase_meas #(
         fifo_pop = 1'b0;
         case (avs_address)
             5'h00: avs_readdata = {31'd0, enable};
-            5'h01: avs_readdata = {26'd0, fifo_empty, overflow, fifo_count[3:0]};
+            5'h01: avs_readdata = {25'd0, fifo_empty, overflow, fifo_count[4:0]};
             5'h02: avs_readdata = rd_vita[31:0];
             5'h03: avs_readdata = rd_vita[63:32];
             5'h04: avs_readdata = rd_rise_a;

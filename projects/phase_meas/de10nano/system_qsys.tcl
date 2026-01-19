@@ -88,6 +88,19 @@ add_interface pll_b_clk clock source
 set_interface_property pll_b_clk EXPORT_OF pll_b.outclk0
 
 # =============================================================================
+# Phase DPS Controller - Controls PLL B dynamic phase shift
+# Uses Avalon-MM master to write DPS registers and poll STATUS for completion
+# =============================================================================
+
+add_instance phase_dps_ctrl_0 phase_dps_ctrl
+
+add_connection sys_clk.clk phase_dps_ctrl_0.if_clk
+add_connection sys_clk.clk_reset phase_dps_ctrl_0.if_reset
+
+# Connect DPS controller master to PLL B reconfig slave
+add_connection phase_dps_ctrl_0.avm pll_b_reconfig.mgmt_avalon_slave
+
+# =============================================================================
 # Phase Measurement System
 # Uses h2f_user2_clock (100 MHz from HPS) for sampling to avoid PLL overflow
 # Device has only 3 fractional PLL locations: pixel_clk_pll + pll_a + pll_b
@@ -124,6 +137,9 @@ ad_cpu_interconnect 0x00041000 pll_b_reconfig.mgmt_avalon_slave
 
 # Phase measurement registers: 0x00042000
 ad_cpu_interconnect 0x00042000 phase_meas_0.avs
+
+# Phase DPS controller registers: 0x00043000
+ad_cpu_interconnect 0x00043000 phase_dps_ctrl_0.avs
 
 # =============================================================================
 # Interrupts
