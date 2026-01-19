@@ -24,13 +24,13 @@ set_global_assignment -name MESSAGE_DISABLE 15003
 set_location_assignment PIN_W11 -to clk_a_out
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk_a_out
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to clk_a_out
-set_instance_assignment -name SLEW_RATE 2 -to clk_a_out
+set_instance_assignment -name SLEW_RATE 1 -to clk_a_out
 
 # clk_b_out: GPIO_0[9] / PIN_AH3 / JP1 pin 14
 set_location_assignment PIN_AH3 -to clk_b_out
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk_b_out
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to clk_b_out
-set_instance_assignment -name SLEW_RATE 2 -to clk_b_out
+set_instance_assignment -name SLEW_RATE 1 -to clk_b_out
 
 # =============================================================================
 # Build options

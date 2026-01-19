@@ -6,6 +6,8 @@
 // Two PLLs output clocks to GPIO pins for oscilloscope testing
 // Internal phase measurement with 200 MHz sampling
 //
+// Uses minimal base system (no HDMI/video DMA) to fit in device
+//
 // ***************************************************************************
 // ***************************************************************************
 
@@ -67,11 +69,11 @@ module system_top (
   output            uart0_tx,
   inout             hps_conv_usb_n,
 
-  // board gpio
+  // board gpio - directly drive LEDs from GPIO module
   output  [  7:0]   gpio_bd_o,
   input   [  5:0]   gpio_bd_i,
 
-  // hdmi (directly connected but unused in this project)
+  // hdmi - directly connected but unused (tie off)
   output            hdmi_out_clk,
   output            hdmi_vsync,
   output            hdmi_hsync,
@@ -90,8 +92,8 @@ module system_top (
 
   // internal signals
   wire             sys_resetn;
-  wire    [63:0]   gpio_i;
-  wire    [63:0]   gpio_o;
+  wire    [7:0]    gpio_i;
+  wire    [7:0]    gpio_o;
 
   wire             i2c0_out_data;
   wire             i2c0_sda;
@@ -102,15 +104,22 @@ module system_top (
   wire             pll_a_clk;
   wire             pll_b_clk;
 
-  // GPIO directly connected
-  assign gpio_i[63:14] = gpio_o[63:14];
-  assign gpio_i[13:8]  = gpio_bd_i[5:0];
+  // GPIO directly connected (minimal 8-bit GPIO)
+  assign gpio_i[7:6]   = 2'b00;
+  assign gpio_i[5:0]   = gpio_bd_i[5:0];
   assign gpio_bd_o[7:0] = gpio_o[7:0];
 
   // Output PLL clocks to GPIO pins
   // These are directly driven by the PLL outputs
   assign clk_a_out = pll_a_clk;
   assign clk_b_out = pll_b_clk;
+
+  // HDMI outputs - tie off (unused in minimal system)
+  assign hdmi_out_clk = 1'b0;
+  assign hdmi_vsync   = 1'b0;
+  assign hdmi_hsync   = 1'b0;
+  assign hdmi_data_e  = 1'b0;
+  assign hdmi_data    = 24'h000000;
 
   // HDMI I2C buffers (directly connected but unused)
   ALT_IOBUF scl_iobuf (
@@ -199,23 +208,9 @@ module system_top (
 
     .sys_hps_hps_io_hps_io_gpio_inst_GPIO09 (hps_conv_usb_n),
 
-    .sys_gpio_bd_in_port (gpio_i[31:0]),
-    .sys_gpio_bd_out_port (gpio_o[31:0]),
-    .sys_gpio_in_export (gpio_i[63:32]),
-    .sys_gpio_out_export (gpio_o[63:32]),
-
-    // LTC2308 SPI (directly on DE10-Nano board, directly connected)
-    .ltc2308_spi_MISO (1'b0),
-    .ltc2308_spi_MOSI (),
-    .ltc2308_spi_SCLK (),
-    .ltc2308_spi_SS_n (),
-
-    // HDMI - directly connected but unused
-    .axi_hdmi_tx_0_hdmi_if_h_clk (hdmi_out_clk),
-    .axi_hdmi_tx_0_hdmi_if_h24_hsync (hdmi_hsync),
-    .axi_hdmi_tx_0_hdmi_if_h24_vsync (hdmi_vsync),
-    .axi_hdmi_tx_0_hdmi_if_h24_data_e (hdmi_data_e),
-    .axi_hdmi_tx_0_hdmi_if_h24_data (hdmi_data),
+    // Minimal GPIO (8-bit bidirectional)
+    .sys_gpio_bd_in_port (gpio_i[7:0]),
+    .sys_gpio_bd_out_port (gpio_o[7:0]),
 
     // PLL clock outputs
     .pll_a_clk_clk (pll_a_clk),

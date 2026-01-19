@@ -7,7 +7,9 @@
 # Two PLLs with reconfiguration + 200MHz sampling clock + edge counters
 
 source $ad_hdl_dir/projects/scripts/adi_pd.tcl
-source $ad_hdl_dir/projects/common/de10nano/de10nano_system_qsys.tcl
+
+# Use minimal base system without HDMI/video DMA to save resources
+source $ad_hdl_dir/projects/phase_meas/de10nano/de10nano_system_qsys_minimal.tcl
 
 # System ID
 set_instance_parameter_value axi_sysid_0 {ROM_ADDR_BITS} {9}
@@ -144,4 +146,4 @@ ad_cpu_interconnect 0x00042000 phase_meas_0.avs
 # =============================================================================
 
 # Phase measurement interrupt on IRQ 4
-ad_cpu_interrupt 4 phase_meas_0.if_irq
+ad_cpu_interrupt 4 phase_meas_0.interrupt_sender

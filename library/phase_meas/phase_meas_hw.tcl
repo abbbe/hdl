@@ -74,4 +74,8 @@ ad_interface signal clk_a_in input 1 clk_in
 ad_interface signal clk_b_in input 1 clk_in
 
 # Interrupt
-ad_interface intr irq output 1 if_avs_clk
+add_interface interrupt_sender interrupt end
+set_interface_property interrupt_sender associatedClock if_avs_clk
+set_interface_property interrupt_sender associatedReset if_avs_reset
+set_interface_property interrupt_sender ENABLED true
+add_interface_port interrupt_sender irq irq Output 1
