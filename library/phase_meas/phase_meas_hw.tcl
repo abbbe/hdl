@@ -8,24 +8,32 @@ package require qsys 14.0
 source ../../scripts/adi_env.tcl
 source $ad_hdl_dir/library/scripts/adi_ip_intel.tcl
 
-ad_ip_create phase_meas {Phase Measurement System}
+set_module_property NAME phase_meas
+set_module_property DESCRIPTION "Phase Measurement System"
+set_module_property VERSION 1.0
+set_module_property GROUP "Analog Devices"
+set_module_property DISPLAY_NAME phase_meas
 
+# Source files
 ad_ip_files phase_meas [list \
     phase_meas.v \
 ]
 
 # Parameters
-ad_ip_parameter SAMPLE_CLK_FREQ INTEGER 200000000 true [list \
-    DISPLAY_NAME "Sample Clock Frequency (Hz)" \
-]
-ad_ip_parameter SAMPLE_INTERVAL_US INTEGER 500 true [list \
-    DISPLAY_NAME "Sample Interval (microseconds)" \
-]
+add_parameter SAMPLE_CLK_FREQ INTEGER 200000000
+set_parameter_property SAMPLE_CLK_FREQ DEFAULT_VALUE 200000000
+set_parameter_property SAMPLE_CLK_FREQ DISPLAY_NAME "Sample Clock Frequency (Hz)"
+set_parameter_property SAMPLE_CLK_FREQ HDL_PARAMETER true
+
+add_parameter SAMPLE_INTERVAL_US INTEGER 500
+set_parameter_property SAMPLE_INTERVAL_US DEFAULT_VALUE 500
+set_parameter_property SAMPLE_INTERVAL_US DISPLAY_NAME "Sample Interval (microseconds)"
+set_parameter_property SAMPLE_INTERVAL_US HDL_PARAMETER true
 
 # 200 MHz Sampling Clock
 ad_interface clock sample_clk input 1
 
-# Reset (active high)
+# Reset (active high, directly connected to sample_clk)
 ad_interface reset reset input 1 if_sample_clk
 
 # Avalon-MM Clock (50 MHz sys_clk)
@@ -37,8 +45,8 @@ ad_interface reset avs_reset input 1 if_avs_clk
 # Avalon-MM Slave Interface
 add_interface avs avalon end
 set_interface_property avs addressUnits WORDS
-set_interface_property avs associatedClock avs_clk
-set_interface_property avs associatedReset avs_reset
+set_interface_property avs associatedClock if_avs_clk
+set_interface_property avs associatedReset if_avs_reset
 set_interface_property avs bitsPerSymbol 8
 set_interface_property avs burstOnBurstBoundariesOnly false
 set_interface_property avs burstcountUnits WORDS
@@ -60,19 +68,10 @@ add_interface_port avs avs_write write Input 1
 add_interface_port avs avs_writedata writedata Input 32
 
 # Clock A input conduit
-add_interface clk_a_in conduit end
-set_interface_property clk_a_in associatedClock ""
-set_interface_property clk_a_in associatedReset ""
-add_interface_port clk_a_in clk_a_in clk_in Input 1
+ad_interface signal clk_a_in input 1 clk_in
 
 # Clock B input conduit
-add_interface clk_b_in conduit end
-set_interface_property clk_b_in associatedClock ""
-set_interface_property clk_b_in associatedReset ""
-add_interface_port clk_b_in clk_b_in clk_in Input 1
+ad_interface signal clk_b_in input 1 clk_in
 
 # Interrupt
-add_interface irq interrupt end
-set_interface_property irq associatedClock avs_clk
-set_interface_property irq associatedReset avs_reset
-add_interface_port irq irq irq Output 1
+ad_interface intr irq output 1 if_avs_clk

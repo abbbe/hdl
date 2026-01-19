@@ -111,20 +111,20 @@ add_instance phase_meas_0 phase_meas
 set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {200000000}
 set_instance_parameter_value phase_meas_0 {SAMPLE_INTERVAL_US} {500}
 
-# Connect 200 MHz sampling clock
-add_connection pll_sample.outclk0 phase_meas_0.sample_clk
-add_connection sys_clk.clk_reset phase_meas_0.reset
+# Connect 200 MHz sampling clock (if_sample_clk interface)
+add_connection pll_sample.outclk0 phase_meas_0.if_sample_clk
+add_connection sys_clk.clk_reset phase_meas_0.if_reset
 
-# Connect 50 MHz sys_clk for register interface
-add_connection sys_clk.clk phase_meas_0.avs_clk
-add_connection sys_clk.clk_reset phase_meas_0.avs_reset
+# Connect 50 MHz sys_clk for register interface (if_avs_clk interface)
+add_connection sys_clk.clk phase_meas_0.if_avs_clk
+add_connection sys_clk.clk_reset phase_meas_0.if_avs_reset
 
 # Export clock inputs (directly wired in system_top.v)
 add_interface clk_a_in conduit end
-set_interface_property clk_a_in EXPORT_OF phase_meas_0.clk_a_in
+set_interface_property clk_a_in EXPORT_OF phase_meas_0.if_clk_a_in
 
 add_interface clk_b_in conduit end
-set_interface_property clk_b_in EXPORT_OF phase_meas_0.clk_b_in
+set_interface_property clk_b_in EXPORT_OF phase_meas_0.if_clk_b_in
 
 # =============================================================================
 # CPU Interconnect - Memory mapped addresses
@@ -144,4 +144,4 @@ ad_cpu_interconnect 0x00042000 phase_meas_0.avs
 # =============================================================================
 
 # Phase measurement interrupt on IRQ 4
-ad_cpu_interrupt 4 phase_meas_0.irq
+ad_cpu_interrupt 4 phase_meas_0.if_irq
