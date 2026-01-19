@@ -8,8 +8,9 @@
 
 source $ad_hdl_dir/projects/scripts/adi_pd.tcl
 
-# Use minimal base system without HDMI/video DMA to save resources
-source $ad_hdl_dir/projects/phase_meas/de10nano/de10nano_system_qsys_minimal.tcl
+# Use full base system - minimal system broke HPS boot
+# HDMI/video DMA uses resources but HPS bridge config is correct
+source $ad_hdl_dir/projects/common/de10nano/de10nano_system_qsys.tcl
 
 # System ID
 set_instance_parameter_value axi_sysid_0 {ROM_ADDR_BITS} {9}
