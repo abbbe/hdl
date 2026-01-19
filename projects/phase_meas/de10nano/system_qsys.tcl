@@ -88,34 +88,17 @@ add_interface pll_b_clk clock source
 set_interface_property pll_b_clk EXPORT_OF pll_b.outclk0
 
 # =============================================================================
-# Sampling PLL - 200 MHz for edge counting
-# =============================================================================
-
-add_instance pll_sample altera_pll
-set_instance_parameter_value pll_sample {gui_feedback_clock} {Global Clock}
-set_instance_parameter_value pll_sample {gui_operation_mode} {direct}
-set_instance_parameter_value pll_sample {gui_number_of_clocks} {1}
-set_instance_parameter_value pll_sample {gui_output_clock_frequency0} {200.0}
-set_instance_parameter_value pll_sample {gui_phase_shift0} {0}
-set_instance_parameter_value pll_sample {gui_pll_auto_reset} {Off}
-set_instance_parameter_value pll_sample {gui_pll_bandwidth_preset} {Auto}
-set_instance_parameter_value pll_sample {gui_pll_mode} {Integer-N PLL}
-set_instance_parameter_value pll_sample {gui_reference_clock_frequency} {50.0}
-set_instance_parameter_value pll_sample {gui_en_reconf} {0}
-
-add_connection sys_clk.clk pll_sample.refclk
-add_connection sys_clk.clk_reset pll_sample.reset
-
-# =============================================================================
 # Phase Measurement System
+# Uses h2f_user2_clock (100 MHz from HPS) for sampling to avoid PLL overflow
+# Device has only 3 fractional PLL locations: pixel_clk_pll + pll_a + pll_b
 # =============================================================================
 
 add_instance phase_meas_0 phase_meas
-set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {200000000}
+set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {100000000}
 set_instance_parameter_value phase_meas_0 {SAMPLE_INTERVAL_US} {500}
 
-# Connect 200 MHz sampling clock (if_sample_clk interface)
-add_connection pll_sample.outclk0 phase_meas_0.if_sample_clk
+# Connect 100 MHz h2f_user2_clock for sampling (if_sample_clk interface)
+add_connection sys_hps.h2f_user2_clock phase_meas_0.if_sample_clk
 add_connection sys_clk.clk_reset phase_meas_0.if_reset
 
 # Connect 50 MHz sys_clk for register interface (if_avs_clk interface)
