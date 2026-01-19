@@ -1,6 +1,6 @@
 // Phase Measurement System
-// Samples two clock signals at 200 MHz and counts rising/falling edges
-// Outputs edge counts and phase difference to FIFO at 2 kHz
+// Samples two clock signals at configurable rate (default 200 MHz) and counts rising/falling edges
+// Outputs edge counts and phase difference to FIFO at configurable rate (default 2 kHz)
 //
 // Register Map (from HPS via Avalon-MM):
 //   0x00: CTRL     (R/W) - bit0=enable, bit1=clear_fifo

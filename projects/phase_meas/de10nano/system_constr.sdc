@@ -15,7 +15,7 @@ derive_clock_uncertainty
 
 # PLL A and PLL B output clocks - treat as async to sys_clk and sampling clock
 # These are dynamically reconfigurable so phase relationship is not known
-# h2f_user2_clock (100 MHz from HPS) is used for sampling - also async to measured clocks
+# h2f_user2_clock (400 MHz from HPS) is used for sampling - also async to measured clocks
 set_clock_groups -asynchronous \
     -group [get_clocks {i_system_bd|pll_a|altera_pll_i|*}] \
     -group [get_clocks {i_system_bd|pll_b|altera_pll_i|*}] \

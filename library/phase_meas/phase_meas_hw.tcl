@@ -30,7 +30,7 @@ set_parameter_property SAMPLE_INTERVAL_US DEFAULT_VALUE 500
 set_parameter_property SAMPLE_INTERVAL_US DISPLAY_NAME "Sample Interval (microseconds)"
 set_parameter_property SAMPLE_INTERVAL_US HDL_PARAMETER true
 
-# 200 MHz Sampling Clock
+# Sampling Clock (configurable, default 200 MHz)
 ad_interface clock sample_clk input 1
 
 # Reset (active high, directly connected to sample_clk)
