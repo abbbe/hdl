@@ -318,9 +318,10 @@ def main():
             print("Current PLL Configuration:")
             for name, pll in [("PLL_A", pll_a), ("PLL_B", pll_b)]:
                 cfg = pll.get_current_config()
-                freq = pll.calc_freq(cfg['M'], cfg['N'], cfg['K'], cfg['C0'])
-                print(f"  {name}: M={cfg['M']}, N={cfg['N']}, K=0x{cfg['K']:08X}, C0={cfg['C0']}")
-                print(f"         -> {freq:.6f} MHz")
+                # Note: K (fractional) cannot be read back from PLL reconfig IP
+                freq = pll.calc_freq(cfg['M'], cfg['N'], 0, cfg['C0'])
+                print(f"  {name}: M={cfg['M']}, N={cfg['N']}, C0={cfg['C0']}")
+                print(f"         -> {freq:.6f} MHz (K not readable)")
 
             # Show DPS status
             try:
