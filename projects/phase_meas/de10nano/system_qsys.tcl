@@ -102,16 +102,16 @@ add_connection phase_dps_ctrl_0.avm pll_b_reconfig.mgmt_avalon_slave
 
 # =============================================================================
 # Phase Measurement System
-# Uses h2f_user2_clock (100 MHz from HPS) for sampling
-# Device has only 3 fractional PLL locations: pixel_clk_pll + pll_a + pll_b
+# TEST: Using sys_clk (50 MHz) as sample clock to verify system works
+# Nyquist limit = 25 MHz, so can only measure clocks up to ~25 MHz
 # =============================================================================
 
 add_instance phase_meas_0 phase_meas
-set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {100000000}
+set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {50000000}
 set_instance_parameter_value phase_meas_0 {SAMPLE_INTERVAL_US} {500}
 
-# Connect h2f_user2_clock (100 MHz) for sampling (if_sample_clk interface)
-add_connection sys_hps.h2f_user2_clock phase_meas_0.if_sample_clk
+# TEST: Use sys_clk (50 MHz) for sampling to verify with known clock
+add_connection sys_clk.clk phase_meas_0.if_sample_clk
 add_connection sys_clk.clk_reset phase_meas_0.if_reset
 
 # Connect 50 MHz sys_clk for register interface (if_avs_clk interface)

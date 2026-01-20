@@ -15,11 +15,11 @@ derive_clock_uncertainty
 
 # PLL A and PLL B output clocks - treat as async to sys_clk and sampling clock
 # These are dynamically reconfigurable so phase relationship is not known
-# h2f_user2_clock (100 MHz from HPS) is used for sampling - also async to measured clocks
+# pixel_clk_pll.outclk1 (200 MHz) is used for sampling - async to measured clocks
 set_clock_groups -asynchronous \
     -group [get_clocks {i_system_bd|pll_a|altera_pll_i|*}] \
     -group [get_clocks {i_system_bd|pll_b|altera_pll_i|*}] \
-    -group [get_clocks {i_system_bd|sys_hps|fpga_interfaces|clocks_resets|h2f_user2_clk}] \
+    -group [get_clocks {i_system_bd|pixel_clk_pll|altera_pll_i|*}] \
     -group [get_clocks {sys_clk}]
 
 # PLL output clocks to GPIO pins - async outputs, relaxed constraints

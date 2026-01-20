@@ -16,6 +16,8 @@
 //   0x28: DBG_FALL_A (R) - raw falling edge counter ch_a
 //   0x2C: DBG_RISE_B (R) - raw rising edge counter ch_b
 //   0x30: DBG_FALL_B (R) - raw falling edge counter ch_b
+//   0x34: DBG_GATE_CYCLES (R) - computed gate cycles constant
+//   0x38: DBG_SAMPLE_FREQ (R) - sample clock frequency parameter
 
 module phase_meas #(
     parameter SAMPLE_CLK_FREQ   = 200000000,  // 200 MHz sampling clock
@@ -361,6 +363,8 @@ module phase_meas #(
             5'h0A: avs_readdata = fall_cnt_a_sync;  // DEBUG: raw falling counter ch_a
             5'h0B: avs_readdata = rise_cnt_b_sync;  // DEBUG: raw rising counter ch_b
             5'h0C: avs_readdata = fall_cnt_b_sync;  // DEBUG: raw falling counter ch_b
+            5'h0D: avs_readdata = GATE_CYCLES;      // DEBUG: computed gate cycles
+            5'h0E: avs_readdata = SAMPLE_CLK_FREQ;  // DEBUG: sample clock frequency
             default: avs_readdata = 32'd0;
         endcase
     end
