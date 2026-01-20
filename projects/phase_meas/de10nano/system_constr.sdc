@@ -15,7 +15,7 @@ derive_clock_uncertainty
 
 # PLL A and PLL B output clocks - treat as async to sys_clk and sampling clock
 # These are dynamically reconfigurable so phase relationship is not known
-# pixel_clk_pll.outclk1 (200 MHz) is used for sampling - async to measured clocks
+# pixel_clk_pll.outclk0 (200 MHz) is used for sampling - async to measured clocks
 set_clock_groups -asynchronous \
     -group [get_clocks {i_system_bd|pll_a|altera_pll_i|*}] \
     -group [get_clocks {i_system_bd|pll_b|altera_pll_i|*}] \
@@ -25,9 +25,6 @@ set_clock_groups -asynchronous \
 # PLL output clocks to GPIO pins - async outputs, relaxed constraints
 set_false_path -to [get_ports {clk_a_out}]
 set_false_path -to [get_ports {clk_b_out}]
-
-# HDMI outputs - tied off, no timing requirements
-set_false_path -to [get_ports {hdmi_*}]
 
 # Phase measurement module - clock domain crossing constraints
 # These are properly synchronized with 2-stage synchronizers or FIFOs

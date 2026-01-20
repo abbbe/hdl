@@ -20,14 +20,14 @@ set_instance_parameter_value rom_sys_0 {ROM_ADDR_BITS} {9}
 sysid_gen_sys_init_file
 
 # =============================================================================
-# PLL A - First clock output (100 MHz nominal, reconfigurable)
+# PLL A - First clock output (40 MHz nominal, reconfigurable)
 # =============================================================================
 
 add_instance pll_a altera_pll
 set_instance_parameter_value pll_a {gui_feedback_clock} {Global Clock}
 set_instance_parameter_value pll_a {gui_operation_mode} {direct}
 set_instance_parameter_value pll_a {gui_number_of_clocks} {1}
-set_instance_parameter_value pll_a {gui_output_clock_frequency0} {100.0}
+set_instance_parameter_value pll_a {gui_output_clock_frequency0} {40.0}
 set_instance_parameter_value pll_a {gui_phase_shift0} {0}
 set_instance_parameter_value pll_a {gui_phase_shift_deg0} {0.0}
 set_instance_parameter_value pll_a {gui_pll_auto_reset} {Off}
@@ -54,14 +54,14 @@ add_interface pll_a_clk clock source
 set_interface_property pll_a_clk EXPORT_OF pll_a.outclk0
 
 # =============================================================================
-# PLL B - Second clock output (100 MHz nominal, reconfigurable)
+# PLL B - Second clock output (40 MHz nominal, reconfigurable)
 # =============================================================================
 
 add_instance pll_b altera_pll
 set_instance_parameter_value pll_b {gui_feedback_clock} {Global Clock}
 set_instance_parameter_value pll_b {gui_operation_mode} {direct}
 set_instance_parameter_value pll_b {gui_number_of_clocks} {1}
-set_instance_parameter_value pll_b {gui_output_clock_frequency0} {100.0}
+set_instance_parameter_value pll_b {gui_output_clock_frequency0} {40.0}
 set_instance_parameter_value pll_b {gui_phase_shift0} {0}
 set_instance_parameter_value pll_b {gui_phase_shift_deg0} {0.0}
 set_instance_parameter_value pll_b {gui_pll_auto_reset} {Off}
@@ -102,16 +102,16 @@ add_connection phase_dps_ctrl_0.avm pll_b_reconfig.mgmt_avalon_slave
 
 # =============================================================================
 # Phase Measurement System
-# TEST: Using sys_clk (50 MHz) as sample clock to verify system works
-# Nyquist limit = 25 MHz, so can only measure clocks up to ~25 MHz
+# Uses 200 MHz from pixel_clk_pll for sampling (5 ns resolution)
+# Can measure clocks up to ~100 MHz (Nyquist)
 # =============================================================================
 
 add_instance phase_meas_0 phase_meas
-set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {50000000}
+set_instance_parameter_value phase_meas_0 {SAMPLE_CLK_FREQ} {200000000}
 set_instance_parameter_value phase_meas_0 {SAMPLE_INTERVAL_US} {500}
 
-# TEST: Use sys_clk (50 MHz) for sampling to verify with known clock
-add_connection sys_clk.clk phase_meas_0.if_sample_clk
+# Use 200 MHz pixel_clk_pll.outclk0 for sampling
+add_connection pixel_clk_pll.outclk0 phase_meas_0.if_sample_clk
 add_connection sys_clk.clk_reset phase_meas_0.if_reset
 
 # Connect 50 MHz sys_clk for register interface (if_avs_clk interface)

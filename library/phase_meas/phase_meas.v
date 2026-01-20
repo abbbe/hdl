@@ -183,11 +183,12 @@ module phase_meas #(
             fifo_wr_ptr <= 0;
             fifo_wr_en <= 1'b0;
         end else if (!enable_sample) begin
+            // When disabled, update prev values but don't reset FIFO pointer
+            // This allows reading FIFO contents after disable
             rise_prev_a <= rise_cnt_a;
             fall_prev_a <= fall_cnt_a;
             rise_prev_b <= rise_cnt_b;
             fall_prev_b <= fall_cnt_b;
-            fifo_wr_ptr <= 0;
             fifo_wr_en <= 1'b0;
         end else if (gate_expired) begin
             // Compute deltas
@@ -278,10 +279,9 @@ module phase_meas #(
     end
 
     // FIFO read pointer management
+    // Note: Don't reset pointer on disable - allows reading FIFO after disable
     always @(posedge avs_clk) begin
         if (avs_reset) begin
-            fifo_rd_ptr <= 0;
-        end else if (!enable) begin
             fifo_rd_ptr <= 0;
         end else if (fifo_pop && !fifo_empty) begin
             fifo_rd_ptr <= fifo_rd_ptr + 1;

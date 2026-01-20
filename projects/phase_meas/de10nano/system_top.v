@@ -71,16 +71,6 @@ module system_top (
   output  [  7:0]   gpio_bd_o,
   input   [  5:0]   gpio_bd_i,
 
-  // hdmi
-  output            hdmi_out_clk,
-  output            hdmi_vsync,
-  output            hdmi_hsync,
-  output            hdmi_data_e,
-  output  [ 23:0]   hdmi_data,
-
-  inout             hdmi_i2c_scl,
-  inout             hdmi_i2c_sda,
-
   // ltc2308 adc spi (directly on DE10-Nano board)
   input             ltc2308_miso,
   output            ltc2308_mosi,
@@ -100,11 +90,6 @@ module system_top (
   wire    [63:0]   gpio_o;
   wire    [63:0]   gpio_t;
 
-  wire             i2c0_out_data;
-  wire             i2c0_sda;
-  wire             i2c0_out_clk;
-  wire             i2c0_scl_in_clk;
-
   // PLL clock signals
   wire             pll_a_clk;
   wire             pll_b_clk;
@@ -117,19 +102,6 @@ module system_top (
   // Output PLL clocks to GPIO pins
   assign clk_a_out = pll_a_clk;
   assign clk_b_out = pll_b_clk;
-
-  // IO Buffers for HDMI I2C
-  ALT_IOBUF scl_video_iobuf (
-    .i(1'b0),
-    .oe(i2c0_out_clk),
-    .o(i2c0_scl_in_clk),
-    .io(hdmi_i2c_scl));
-
-  ALT_IOBUF sda_video_iobuf (
-    .i(1'b0),
-    .oe(i2c0_out_data),
-    .o(i2c0_sda),
-    .io(hdmi_i2c_sda));
 
   system_bd i_system_bd (
     .sys_clk_clk(sys_clk),
@@ -151,10 +123,6 @@ module system_top (
     .sys_hps_memory_mem_dm(ddr3_dm),
     .sys_hps_memory_oct_rzqin(ddr3_rzq),
     .sys_rst_reset_n(sys_resetn),
-    .sys_hps_i2c0_out_data(i2c0_out_data),
-    .sys_hps_i2c0_sda(i2c0_sda),
-    .sys_hps_i2c0_clk_clk(i2c0_out_clk),
-    .sys_hps_i2c0_scl_in_clk(i2c0_scl_in_clk),
     .sys_hps_hps_io_hps_io_emac1_inst_TX_CLK(eth1_tx_clk),
     .sys_hps_hps_io_hps_io_emac1_inst_TXD0(eth1_tx_d[0]),
     .sys_hps_hps_io_hps_io_emac1_inst_TXD1(eth1_tx_d[1]),
@@ -202,11 +170,6 @@ module system_top (
     .ltc2308_spi_MOSI(ltc2308_mosi),
     .ltc2308_spi_SCLK(ltc2308_sclk),
     .ltc2308_spi_SS_n(ltc2308_cs),
-    .axi_hdmi_tx_0_hdmi_if_h_clk(hdmi_out_clk),
-    .axi_hdmi_tx_0_hdmi_if_h24_hsync(hdmi_hsync),
-    .axi_hdmi_tx_0_hdmi_if_h24_vsync(hdmi_vsync),
-    .axi_hdmi_tx_0_hdmi_if_h24_data_e(hdmi_data_e),
-    .axi_hdmi_tx_0_hdmi_if_h24_data(hdmi_data),
     // PLL clock outputs
     .pll_a_clk_clk(pll_a_clk),
     .pll_b_clk_clk(pll_b_clk),
